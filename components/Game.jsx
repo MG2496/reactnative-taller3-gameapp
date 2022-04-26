@@ -1,58 +1,98 @@
 import { StyleSheet, Text, View } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import Number from "./Number";
 
-export default Game = ({ randomNumbersCount }) => {
-    const [randomNumbers, setRandomNumbers ] = useState([]);
-    const [ target, setTarget ] = useState(0);
-    const [ selectedNumbers, setSelectedNumbers ] = useState([]);
-    
-    //const target = 10 + Math.floor(40 * Math.random());
+export default Game = ({ randomNumbersCount, initialSeconds }) => {
+  const [ randomNumbers, setRandomNumbers ] = useState([]);
+  const [ target, setTarget ] = useState();
+  const [ selectedNumbers, setSelectedNumbers ] = useState([]);
+  const [ remainingSeconds, setRemainingSeconds ] = useState(initialSeconds);
+  const [ gameStatus, setGameStatus ] = useState('PLAYING');
 
-    //const numbers = Array.from({ length: randomNumbers }).map(() => 1 + Math.floor(10 * Math.random()));
-    //const target = numbers.slice(0, randomNumbers -2).reduce( (acc, cur) => acc + cur, 0);
+  const intervalId = useRef();
 
-    //const [selectedNumbers, setSelectedNumbers] = useState([]);
+  useEffect(() => console.log(selectedNumbers), [selectedNumbers]);
 
-    useEffect(() => {
-        const numbers = Array.from({ length: randomNumbersCount }).map(() => 1 + Math.floor(10 * Math.random()));
-        const target = numbers.slice(0, randomNumbersCount -2).reduce( (acc, cur) => acc + cur, 0); 
-        setRandomNumbers(numbers);
-        setTarget(target);
-    }, []);
+  useEffect(() => {
+    const numbers = Array.from({ length: randomNumbersCount}).map(() => 1 + Math.floor(10 * Math.random()));
+    const target = numbers.slice(0, randomNumbersCount -2).reduce( (acc, cur) => acc + cur, 0 );
 
-    const isNumberSelected = numberIndex => selectedNumbers.some(number => number === numberIndex);
+    setRandomNumbers(numbers);
+    setTarget(target);
 
-    const selectNumber = number => setSelectedNumbers ([...selectedNumbers, number]);
+    intervalId.current = setInterval(() => setRemainingSeconds(seconds => seconds -1), 1000);
+    return () => clearInterval(intervalId.current);
+  }, []);
 
+  useEffect(() => {
+    setGameStatus(() =>  getGameStatus());
+    if (remainingSeconds  === 0 || gameStatus !== 'PLAYING') {
+      clearInterval(intervalId.current);
+    }
+  }, [remainingSeconds, selectedNumbers]);
 
-    return (
-        <View>
-            <Text style={styles.target}>{target}</Text>
-            <View style={styles.randomContainer}>
-            {randomNumbers.map((number, index) => (
-                <Number key={index} id={index} number={number} isSelected={isNumberSelected(index)} onSelected={selectNumber} />
-                
-            ))}
-            </View>
-        </View>
-    );
+  const isNumberSelected = numberIndex => selectedNumbers.some(number => number === numberIndex);
+  const selectNumber = number => {
+    setSelectedNumbers([...selectedNumbers, number]);
+  };
+  const getGameStatus = () => {
+    const sumSelected = selectedNumbers.reduce((acc, cur) => acc + randomNumbers[cur], 0);
+    if (remainingSeconds === 0 || sumSelected > target) {
+      return 'LOST';
+    } else if (sumSelected === target) {
+      return 'WON';
+    } else {
+      return 'PLAYING';
+    }
+  };
+
+  return (
+    <View>
+      <Text style={styles.target}>{target}</Text>
+      <Text style={[ styles.target, styles[gameStatus] ]}>{gameStatus}</Text>
+      <Text>{remainingSeconds}</Text>
+      <View style={styles.randomContainer}>
+        {randomNumbers.map((number, index) => (
+          <Number
+            key={index}
+            id={index}
+            number={number}
+            isSelected={isNumberSelected(index) || gameStatus !== 'PLAYING'}
+            onSelected={selectNumber}
+          />
+        ))}
+      </View>
+    </View>
+  );
 };
 
 const styles = StyleSheet.create({
-    target: {
-      fontSize: 40,
-      backgroundColor: 'brown',
-      color: 'white',
-      textAlign: 'center',
-    },
-
-    randomContainer: {
-        flex: 1,
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        justifyContent: 'space-between',
-    },
+  target: {
+    fontSize: 40,
+    backgroundColor: '#ecdfcf',
+    textAlign: 'center',
+    color: '#df5c40',
+  },
+  randomContainer: {
+    flex: 1,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+  },
+  PLAYING: {
+    backgroundColor: '#df5c40',
+    color: 'white'
+  },
+  LOST: {
+    backgroundColor: 'red',
+    color: 'white'
+  },
+  WON: {
+    backgroundColor: 'green',
+    color: 'white',
+    borderRadius: 20,
+  },
+});
 
     // random: {
     //     backgroundColor: 'green',
@@ -65,4 +105,3 @@ const styles = StyleSheet.create({
     // }
 
 
-});
