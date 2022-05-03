@@ -12,8 +12,30 @@ export default Number = ({ id, number, isSelected, onSelected }) => {
     <TouchableOpacity onPress={handlePress}>
       <Text style={[styles.random, isSelected && styles.selected]}>{number}</Text>
     </TouchableOpacity>
-  )
+    )
 };
+
+// export function Button() {
+//     return(
+//         <TouchableOpacity
+//             style = {{
+//                 ...styles.button,
+//                 backgroundColor: '#5859d6',
+//             }}
+//         >
+//             <Text
+//                 style = {{
+//                     ...styles.buttonText,
+//                     color: 'white',
+//                  }}
+//             >
+//             Button
+//         </Text>
+//         </TouchableOpacity>
+//     )
+// };
+
+
 
 const styles = StyleSheet.create({
   random: {
@@ -33,4 +55,18 @@ const styles = StyleSheet.create({
   selected: {
     opacity: 0.6,
   },
+
+//   button: {
+//     paddingVertical: 15,
+//     alignSelf: 'center',
+//     borderRadius: 10,
+//     width: '90%',
+
+//   },
+
+//   buttonText: {
+//     textAlign: 'center',
+
+//   },
+
 });

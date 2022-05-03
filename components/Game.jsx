@@ -66,6 +66,7 @@ export default Game = ({ randomNumbersCount, initialSeconds }) => {
   );
 };
 
+
 const styles = StyleSheet.create({
   target: {
     fontSize: 40,
@@ -84,14 +85,16 @@ const styles = StyleSheet.create({
     color: 'white'
   },
   LOST: {
-    backgroundColor: 'red',
+    backgroundColor: '#ff5252',
     color: 'white'
   },
   WON: {
-    backgroundColor: 'green',
+    backgroundColor: '#77dd77',
     color: 'white',
     borderRadius: 20,
   },
+
+
 });
 
     // random: {
