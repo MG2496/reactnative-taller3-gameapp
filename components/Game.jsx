@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View, Button, TouchableOpacity } from "react-native";
 import React, { useEffect, useState, useRef } from "react";
 import Number from "./Number";
 
@@ -46,11 +46,43 @@ export default Game = ({ randomNumbersCount, initialSeconds }) => {
     }
   };
 
+  ////
+
+  const playAgain = () => {
+    if (remainingSeconds === 0 || gameStatus !== 'PLAYING'){
+        return 'PlayAgainButtonV';
+    }else{
+        return 'PlayAgainButtonH'
+    }
+  };
+
+const playAgainButton = playAgain();
+
+const reloadGame = () => {
+  setGameStatus('PLAYING');
+  setSelectedNumbers([]);
+
+  const numbers = Array.from({ length: randomNumbersCount }).map(() => 1 + Math.floor(10 * Math.random()));
+  const target = numbers.slice(0, randomNumbersCount -2).reduce( (acc, cur) => acc + cur, 0);
+
+  setRandomNumbers(numbers);
+  numbers.sort(() => Math.random()- 0.5);
+  setTarget(target);
+
+  setRemainingSeconds(initialSeconds);
+  intervalId.current = setInterval(() => setRemainingSeconds(seconds => seconds -1), 1000);
+  return () => clearInterval(intervalId.current);  
+  }
+  ////
+
   return (
     <View>
       <Text style={styles.target}>{target}</Text>
       <Text style={[ styles.target, styles[gameStatus] ]}>{gameStatus}</Text>
       <Text>{remainingSeconds}</Text>
+      <TouchableOpacity onPress={reloadGame}>
+          <Text style={[styles[playAgainButton]]}>Play Again</Text>
+      </TouchableOpacity>
       <View style={styles.randomContainer}>
         {randomNumbers.map((number, index) => (
           <Number
@@ -93,7 +125,29 @@ const styles = StyleSheet.create({
     color: 'white',
     borderRadius: 20,
   },
-
+  /////
+  PlayAgainButtonV: {
+    backgroundColor: '#FF9333',
+    width: 100,
+    marginHorizontal: 100,
+    marginVertical: 25,
+    fontSize: 22,
+    color: 'white',
+    textAlign: 'center',
+    borderRadius: 10,
+},
+PlayAgainButtonH: {
+    backgroundColor: '#FF9333',
+    width: 100,
+    marginHorizontal: 100,
+    marginVertical: 25,
+    fontSize: 22,
+    color: 'white',
+    textAlign: 'center',
+    borderRadius: 10,
+    display: 'none',
+},
+/////
 
 });
 
